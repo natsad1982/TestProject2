@@ -1,0 +1,7 @@
+﻿CREATE TABLE [dbo].[Specialists]
+(
+	[Id] INT NOT NULL PRIMARY KEY IDENTITY,
+	[FirstName] NVARCHAR(50) NULL,
+	[LastName] NVARCHAR(150) NULL,
+	[Position] NVARCHAR(350) NULL
+)
