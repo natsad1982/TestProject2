@@ -1,0 +1,265 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    <link rel="stylesheet" href="~/Content/bootstrap.css" />
+    <!--<link href="~/Content/themes/base/jquery-ui.min.css" rel="stylesheet" />-->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.20/datatables.min.css" />
+    <style>
+        div#main-div {
+            margin: 0 auto !Important;
+            width: 100% !important;
+        }
+
+        div#main-div-div1 {
+            margin: 0 auto !Important;
+            width: 100% !important;
+        }
+        div#main-div-div1 table#Table1,div#main-div-div1 table#Table2,div#main-div-div1 table#Table3
+        {
+            width: 100% !important;
+            margin: 0 auto !Important;
+            position: relative !important;
+        }
+        div#menu-div {
+            margin: 0 auto !Important;
+            width: 75% !important;
+            border: 1px solid #000;
+            margin-bottom: 10px !important;
+        }
+
+        div#menu-div2 {
+            margin: 0 auto !Important;
+            width: 100% !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="row">
+        <div class="col-md-4">
+        </div>
+        <div class="col-md-4" style="text-align:center;">
+            <h2>Карточка пациента</h2>
+        </div>
+        <div class="col-md-4">
+        </div>
+    </div>
+    <hr>
+    <div class="row" id="menu-div">
+        <div class="col-md-4">
+            @Html.ActionLink("Пациенты", "Index")
+        </div>
+        <div class="col-md-4" style="text-align:center;">
+            @Html.ActionLink("Специалисты", "Doctors")
+        </div>
+        <div class="col-md-4" style="text-align:right;">
+            @Html.ActionLink("История посещений", "HistoryClients")
+        </div>
+    </div>
+    
+    <div class="row" id="main-div">
+        <div class="col-md-10" id="main-div-div1">
+            <hr>
+            @RenderBody()
+        </div>
+    </div>
+
+    <div class="modal fade" role="dialog" id="ClientModal" aria-labelledby="clientModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content" id="clientModalBody">
+            </div>
+        </div>
+    </div>
+
+    <script src="~/Scripts/jquery-3.4.1.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.20/datatables.min.js"></script>
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+    <script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
+
+    <script type="text/javascript">
+        var dataTable1, dataTable2, dataTable3;
+        $(document).ready(function () {
+            dataTable1 = $('#Table1').DataTable({
+                "ajax": {
+                    "url": "/Home/DataClients",
+                    "type": "GET",
+                    "datatype": "json"
+                },
+                "columns": [
+                    { "data": "IIN" },
+                    { "data": "FirstName" },
+                    { "data": "LastName" },
+                    { "data": "Address" },
+                    { "data": "Phone" },
+                    {
+                        "data": "Id", "width": "100px", "render": function (data) {
+                            return "<button class='btn btn-success' onclick='AddClients(" + data + ")'>Редактировать</button>"
+                        }
+                    },
+                    {
+                        "data": "Id", "width": "100px", "render": function (data) {
+                            return "<button class='btn btn-danger' onclick='DeleteClients(" + data + ")'>Удалить</button>"
+                        }
+                    }
+                ]
+            });
+            dataTable2 = $('#Table2').DataTable({
+                "ajax": {
+                    "url": "/Home/DataDoctors",
+                    "type": "GET",
+                    "datatype": "json"
+                },
+                "columns": [
+                    { "data": "FirstName" },
+                    { "data": "LastName" },
+                    { "data": "Position" },
+                    {
+                        "data": "Id", "width": "100px", "render": function (data) {
+                            return "<button class='btn btn-success' onclick='AddDoctors(" + data + ")'>Редактировать</button>"
+                        }
+                    },
+                    {
+                        "data": "Id", "width": "100px", "render": function (data) {
+                            return "<button class='btn btn-danger' onclick='DeleteDoctors(" + data + ")'>Удалить</button>"
+                        }
+                    }
+                ]
+            });
+            dataTable3 = $('#Table3').DataTable({
+                "ajax": {
+                    "url": "/Home/DataHistoryClients",
+                    "type": "GET",
+                    "datatype": "json"
+                },
+                "columns": [
+                    { "data": "nDoctorFullName" },
+                    { "data": "nClientFullName" },
+                    { "data": "nDiagnose" },
+                    { "data": "nZhaloby" },
+                    { "data": "nDateEntered" },
+                    {
+                        "data": "nId", "width": "100px", "render": function (data) {
+                            return "<button class='btn btn-success' onclick='AddHistoryClients(" + data + ")'>Редактировать</button>"
+                        }
+                    },
+                    {
+                        "data": "nId", "width": "100px", "render": function (data) {
+                            return "<button class='btn btn-danger' onclick='DeleteHistoryClients(" + data + ")'>Удалить</button>"
+                        }
+                    }
+                ]
+            });
+            dataTable1.ajax.reload();
+            dataTable2.ajax.reload();
+            dataTable3.ajax.reload();
+        });
+
+        function AddClients(id) {
+            $.get("/Clients/AddClientsPartialView", { id, id }, function (res) {
+                $("#clientModalBody").html(res);
+                $("#ClientModal").modal("show");
+            })
+        }
+        function AddDoctors(id) {
+            $.get("/Doctors/AddDoctorsPartialView", { id, id }, function (res) {
+                $("#clientModalBody").html(res);
+                $("#ClientModal").modal("show");
+            })
+        }
+        function AddHistoryClients(id) {
+            $.get("/HistoryClients/AddHistoryClientsPartialView", { id, id }, function (res) {
+                $("#clientModalBody").html(res);
+                $("#ClientModal").modal("show");
+            })
+        }
+        function createoredit() {
+            var modal = $("#ClientModal");
+            var form = $("form[name='clientForm']");
+            form.validate();
+            if (!form.valid()) {
+                return;
+            }
+            else {
+                var data = form.serialize();
+                $.post("/Clients/AddOrEditClients", data, function (res) {
+                    if (res) {
+                        modal.modal("hide");
+                        dataTable1.ajax.reload();
+                    }
+                })
+            }
+        }
+        function createoredit2() {
+            var modal = $("#ClientModal");
+            var form = $("form[name='doctorForm']");
+            form.validate();
+            if (!form.valid()) {
+                return;
+            }
+            else {
+                var data = form.serialize();
+                $.post("/Doctors/AddOrEditDoctors", data, function (res) {
+                    if (res) {
+                        modal.modal("hide");
+                        dataTable2.ajax.reload();
+                    }
+                })
+            }
+        }
+        function createoredit3() {
+            var modal = $("#ClientModal");
+            var form = $("form[name='historyClientForm']");
+            form.validate();
+            if (!form.valid()) {
+                return;
+            }
+            else {
+                var data = form.serialize();
+                $.post("/HistoryClients/PostInteractions", data, function (res) {
+                    if (res) {
+                        modal.modal("hide");
+                        dataTable3.ajax.reload();
+                    }
+                })
+            }
+        }
+        function DeleteDoctors(id)
+        {
+            if (confirm("Вы действительно хотите удалить?") == true)
+            {
+                $.get("/Doctors/Delete", {id:id}, function (res) {
+                    if (res) {
+                        dataTable2.ajax.reload();
+                    }
+                })
+            }
+        }
+        function DeleteClients(id) {
+            if (confirm("Вы действительно хотите удалить?") == true) {
+                $.get("/Clients/Delete", { id: id }, function (res) {
+                    if (res) {
+                        dataTable1.ajax.reload();
+                    }
+                })
+            }
+        }
+        function DeleteHistoryClients(id) {
+            if (confirm("Вы действительно хотите удалить?") == true) {
+                $.get("/HistoryClients/Delete", { id: id }, function (res) {
+                    if (res) {
+                        dataTable3.ajax.reload();
+                    }
+                })
+            }
+        }
+    </script>
+</body>
+</html>
